@@ -86,7 +86,7 @@ def tlg_fetch(api_id, api_hash, channel_id, limit=100, file_size_limit=10 * 1024
             if count_downloaded_files > 0:
                 print(f'\n{count_downloaded_files} files downloaded successfully from the {channel.chats[0].title} channel.')
             else:
-                print(f'\nNo new files found in the channel id {channel_id}. \nYou are up-to-date.\n')
+                print(f'\nEverything is up-to-date.\n')
         else:
             print('No messages found in the channel id. Check if your account joined the channel.\n')
             return None
@@ -118,7 +118,6 @@ def main():
                 f.write('[Success]: Log file for the Telegram File Fetcher and Handler(\n')
                 f.write(output)
                 f.write('\n)')
-            print('\nProcess completed successfully.')
         else:
             print('\nProcess failed.')
     else:
