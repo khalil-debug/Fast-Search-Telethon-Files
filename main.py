@@ -65,7 +65,7 @@ def tlg_fetch(api_id, api_hash, channel_id, limit=100, file_size_limit=10 * 1024
         message_index = {}
         # Check if there are messages in the channel
         if messages:
-            print(f'Started fetching files from the channel_id {channel_id}...\n')
+            print(f'Started fetching files from the channel {channel.chats[0].title}...\n')
             # Loop through the messages and download the files
             for message in tqdm(messages):
                 if isinstance(message.media, MessageMediaDocument) and message.media.document.size < file_size_limit:
