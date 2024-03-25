@@ -8,7 +8,7 @@ import subprocess
 from rich import json
 from telethon.sync import TelegramClient
 from telethon.tl.functions.channels import GetFullChannelRequest
-from telethon.tl.types import MessageMediaDocument, MessageMediaPhoto, MessageMediaWebPage
+from telethon.tl.types import MessageMediaDocument, MessageMediaPhoto, MessageMediaWebPage, WebPageEmpty
 from rich.console import Console
 
 # This package will handle cli  from the telegram group
@@ -32,6 +32,7 @@ args = parser.parse_args()
 
 # Rich Text Formatting #
 console = Console()
+
 
 ################################################################################################
 # Functions #
@@ -69,23 +70,23 @@ def tlg_fetch(api_id, api_hash, channel_id, limit=100, file_size_limit=10 * 1024
                         message.download_media(f'{output_dir}/')
                 elif isinstance(message.media, MessageMediaPhoto):
                     message_index[message.media.photo.id] = message.media.photo.id
-                    file_path = f'{output_dir}/photos/{message.media.photo.id}.jpg'
-                    if not os.path.exists(file_path):
+                    file_path_photo = f'{output_dir}/photos/{message.media.photo.id}.jpg'
+                    if not os.path.exists(file_path_photo):
+                        message.download_media(file_path_photo)
                         count_downloaded_files += 1
-                        message.download_media(file_path)
-                elif isinstance(message.media, MessageMediaWebPage):
+                elif isinstance(message.media, MessageMediaWebPage) and not WebPageEmpty:
                     message_index[message.media.webpage.id] = message.media.webpage.url
-                    file_path = f'{output_dir}/webpages/{message.media.webpage.site_name}'
-                    if not os.path.exists(file_path):
+                    file_path_webpage = f'{output_dir}/webpages/{message.media.webpage.site_name}'
+                    if not os.path.exists(file_path_webpage):
+                        message.download_media(file_path_webpage)
                         count_downloaded_files += 1
-                        message.download_media(file_path)
 
             if count_downloaded_files > 0:
-                print(f'{count_downloaded_files} files downloaded successfully from the BF_Repo_V3_Files channel.')
+                print(f'\n{count_downloaded_files} files downloaded successfully from the {channel.chats[0].title} channel.')
             else:
-                print(f'No new files found in the channel id {channel_id}. \nYou are all up-to-date.')
+                print(f'\nNo new files found in the channel id {channel_id}. \nYou are up-to-date.\n')
         else:
-            print('No messages found in the channel id. Check if your account joined the channel.')
+            print('No messages found in the channel id. Check if your account joined the channel.\n')
             return None
         return message_index
 
