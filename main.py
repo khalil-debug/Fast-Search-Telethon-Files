@@ -15,8 +15,6 @@ from rich.console import Console
 from tqdm import tqdm
 
 ################################################################################################
-# ---- Constants ----- #
-
 
 # Argument Parsing #
 
@@ -28,18 +26,12 @@ parser.add_argument('--limit', type=int, help='Number of messages to fetch from 
 parser.add_argument('--file-size-limit', type=int, help='File size limit in bytes to download files from the channel '
                                                         '- Default: 10MB')
 parser.add_argument('--output-dir', type=str, help='Output directory to save the downloaded files - Default: '
-                                                   './BF_Repo_V3_Files_channel_id')
+                                                   './Files')
 parser.add_argument('--log-file', type=str, help='Log file to save the logs - Default: ./logs.log')
 args = parser.parse_args()
 
 # Rich Text Formatting #
 console = Console()
-
-# Client Parameters #
-
-API_ID = 23569076  # This is a Dummy ID Change this to your API ID
-API_HASH = 'cf626688b5041492834324a16839320e'  # Change this to your API Hash
-
 
 ################################################################################################
 # Functions #
