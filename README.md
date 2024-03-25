@@ -1,6 +1,6 @@
 # Telegram File Fetcher and Handler
 
-This project is a Python application that fetches files from a specified Telegram channel and handles them. It's still a work in progress and will be updated with more features.
+This project is a Python script that fetches files from a specified Telegram channel and handles them. It's still a work in progress and will be updated with more features.
 
 ## Requirements
 
