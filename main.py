@@ -74,12 +74,14 @@ def tlg_fetch(api_id, api_hash, channel_id, limit=100, file_size_limit=10 * 1024
                     if not os.path.exists(file_path_photo):
                         message.download_media(file_path_photo)
                         count_downloaded_files += 1
-                elif isinstance(message.media, MessageMediaWebPage) and not WebPageEmpty:
+                elif isinstance(message.media, MessageMediaWebPage):
                     message_index[message.media.webpage.id] = message.media.webpage.url
                     file_path_webpage = f'{output_dir}/webpages/{message.media.webpage.site_name}'
                     if not os.path.exists(file_path_webpage):
-                        message.download_media(file_path_webpage)
-                        count_downloaded_files += 1
+                        if not message.download_media(file_path_webpage):
+                            pass
+                        else:
+                            count_downloaded_files += 1
 
             if count_downloaded_files > 0:
                 print(f'\n{count_downloaded_files} files downloaded successfully from the {channel.chats[0].title} channel.')
