@@ -29,3 +29,4 @@ python main.py [REQUIRED] --api-id YOUR_API_ID --api-hash YOUR_API_HASH --channe
 - `--file-size-limit`: File size limit in bytes to download files from the channel. Default is 10MB.
 - `--output-dir`: Output directory to save the downloaded files. Default is ``./Files``.
 - `--log-file`: Log file to save the logs. Default is ./logs.log.
+- `-c or --process-compressed-files`: Decompress the zip files from the input directory into the same directory. Default is False.

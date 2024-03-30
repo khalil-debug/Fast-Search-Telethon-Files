@@ -4,6 +4,7 @@
 import os
 import argparse
 import subprocess
+import zipfile
 
 from rich import json
 from telethon.sync import TelegramClient
@@ -28,6 +29,9 @@ parser.add_argument('--file-size-limit', type=int, help='File size limit in byte
 parser.add_argument('--output-dir', type=str, help='Output directory to save the downloaded files - Default: '
                                                    './Files')
 parser.add_argument('--log-file', type=str, help='Log file to save the logs - Default: ./logs.log')
+parser.add_argument('-c', '--process-compressed-files', action='store_true', help='Decompress the zip files in the '
+                                                                                  'output'
+                                                                                  'directory')
 args = parser.parse_args()
 
 # Rich Text Formatting #
@@ -50,7 +54,7 @@ def tlg_fetch(api_id, api_hash, channel_id, limit=100, file_size_limit=10 * 1024
 
         # Get the messages from the channel
         messages = client.get_messages(channel.full_chat, limit=limit)
-        # ________________________________________________^^^^^^^^^^  <-- Change this to the number of messages you want to iterate through or remove to process all messages
+        # ________________________________________________^^^^^^^^^^^  <-- Change this to the number of messages you want to iterate through or remove to process all messages
 
         # Initialize the count of downloaded files
         count_downloaded_files = 0
@@ -65,9 +69,11 @@ def tlg_fetch(api_id, api_hash, channel_id, limit=100, file_size_limit=10 * 1024
                     # _________________________________________________^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  <-- Change this to the file size limit you want or remove to download all files
                     message_index[message.media.document.id] = message.media.document.attributes[0].file_name
                     file_path = f'{output_dir}/{message.media.document.attributes[0].file_name}'
-                    if not os.path.exists(file_path):
+                    if not os.path.exists(file_path) and message.media.document.attributes[0].file_name.replace('.zip',
+                                                                                                                '') not in os.listdir(
+                            f'{output_dir}/'):
                         count_downloaded_files += 1
-                        message.download_media(f'{output_dir}/')
+                        tqdm(message.download_media(f'{output_dir}/'))
                 elif isinstance(message.media, MessageMediaPhoto):
                     message_index[message.media.photo.id] = message.media.photo.id
                     file_path_photo = f'{output_dir}/photos/{message.media.photo.id}.jpg'
@@ -84,13 +90,54 @@ def tlg_fetch(api_id, api_hash, channel_id, limit=100, file_size_limit=10 * 1024
                             count_downloaded_files += 1
 
             if count_downloaded_files > 0:
-                print(f'\n{count_downloaded_files} files downloaded successfully from the {channel.chats[0].title} channel.')
+                print(
+                    f'\n{count_downloaded_files} files downloaded successfully from the {channel.chats[0].title} channel.')
             else:
                 print(f'\nEverything is up-to-date.\n')
         else:
             print('No messages found in the channel id. Check if your account joined the channel.\n')
             return None
         return message_index
+
+
+def decompress_zip(zip_file_path):
+    zip_folder = zip_file_path.replace('.zip', '')
+    try:
+        with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+            os.mkdir(zip_folder)  # Create a directory with the same name as the zip file
+            print('Extracting files...\n')
+            if zip_ref.testzip() is not None:
+                print(f'Error: {zip_file_path} is corrupted.')
+                return
+            else:
+                zip_ref.extractall(zip_folder)  # Extract the zip file to the directory
+        # os.remove(zip_file_path)
+        print(f'Successfully decompressed {zip_file_path} into {zip_folder}.\n')
+    except FileNotFoundError:
+        print(f'Error: {zip_file_path} not found.')
+    except zipfile.BadZipFile:
+        print(f'Error: {zip_file_path} is not a zip file.')
+    except RuntimeError:
+        print(f'Error: {zip_file_path} is encrypted, password required for extraction.')
+
+
+def zip_files_extract(output_dir):
+    # Get the zip files in the output directory
+    zip_files = [f for f in os.listdir(output_dir) if
+                 f.endswith('.zip')]  # or f.endswith('.rar') or f.endswith('.7z') or f.endswith('.gz')]
+    if not zip_files:
+        print('No zip files found in the output directory. You\'re all set.')
+    # Check if the output directory exists
+    if not os.path.exists(output_dir):
+        print('Error: Output directory not found.')
+    for zip_file in tqdm(zip_files):
+        # Check if the zip file exists
+        if os.path.exists(zip_file_path := f'{output_dir}/{zip_file}'):
+            # Decompress the zip file
+            decompress_zip(zip_file_path)
+        else:
+            print(f'Error: Zip file {zip_file} not found.')
+    return 'Files decompressed successfully'
 
 
 ################################################################################################
@@ -120,8 +167,11 @@ def main():
                 f.write('\n)')
         else:
             print('\nProcess failed.')
+    elif args.process_compressed_files:
+        zip_files_extract(output_dir)
     else:
-        print('Error: Please provide the required arguments: --api-id, --api-hash, --channel-id')
+        print('Error: Please provide the required arguments: --api-id, --api-hash, --channel-id \n Or -z to extract '
+              'zip files ')
 
 
 if __name__ == "__main__":
