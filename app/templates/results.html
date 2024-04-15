@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block heading %} Search Results - {{ query }} {% endblock %}
+
+{% block content %}
+<body>
+    <ul>
+        {% for username, (score, filename, password) in results.items() %}
+        <li>
+            <ul>
+                <a href="{{ filename }}">{{ filename }}:</a>
+                <li>
+                    Score: {{ score }}
+                </li>
+                <li>
+                    Username: {{ username }}
+                </li>
+                <li>
+                    Password: {{ password }}
+                </li>
+            </ul>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+{% endblock %}

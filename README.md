@@ -8,13 +8,18 @@ This project is a Python script that fetches files from a specified Telegram cha
 - Telethon
 - tqdm
 - rich
+- pandas
+- FastAPI
+- uvicorn
+- Jinja2
+- pyarrow
 
 ## Usage
 
 1. Clone the repository.
 2. Initialize a virtual environment with the command `python -m venv venv` then `.\venv\Scripts\activate`.
 3. Install the required Python packages from requirements.txt with the command `pip install -r requirements.txt`
-4. Run the `TeleFiles.py` script with the required arguments.
+4. Run the `data_search.py` script with the required arguments.
 
 ```bash
 python main.py [REQUIRED] --api-id YOUR_API_ID --api-hash YOUR_API_HASH --channel-id YOUR_CHANNEL_ID [OPTIONAL] --output-dir YOUR_OUTPUT_DIR --file-size-limit YOUR_FILES_SIZE_LIMIT --limit YOUR_MESSAGES_NUMBER_LIMIT --log-file YOUR_LOG_FILE_OUTPUT
@@ -30,3 +35,4 @@ python main.py [REQUIRED] --api-id YOUR_API_ID --api-hash YOUR_API_HASH --channe
 - `--output-dir`: Output directory to save the downloaded files. Default is ``./Files``.
 - `--log-file`: Log file to save the logs. Default is ./logs.log.
 - `-c or --process-compressed-files`: Decompress the zip files from the input directory into the same directory. Default is False.
+- `-s or --search`: Search for a compromised password on the files located the input directory.
