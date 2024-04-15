@@ -1,28 +1,22 @@
 ################################################################################################
 # Libraries #
-import asyncio
-import os
 import argparse
-import shutil
+import asyncio
 import json as js
-import zipfile
-import pandas as pd
+import os
+import shutil
 import subprocess
+import zipfile
 
-import aiohttp
-import psycopg2
-from psycopg2 import sql
-
+import pandas as pd
 from rich import json
+from rich.console import Console
 from telethon.sync import TelegramClient
 from telethon.tl.functions.channels import GetFullChannelRequest
-from telethon.tl.types import MessageMediaDocument, MessageMediaPhoto, MessageMediaWebPage, WebPageEmpty
-from rich.console import Console
+from telethon.tl.types import MessageMediaDocument, MessageMediaPhoto, MessageMediaWebPage
 
 # This package will handle cli  from the telegram group
 from tqdm import tqdm
-
-from src.searchengine.searchengine import SearchEngine
 
 ################################################################################################
 
@@ -41,7 +35,7 @@ parser.add_argument('--log-file', type=str, help='Log file to save the logs - De
 parser.add_argument('-c', '--process-compressed-files', action='store_true', help='Decompress the zip files in the '
                                                                                   'output'
                                                                                   'directory')
-parser.add_argument('-s', '--search', action='store_true', help='Run the server to search passwords in the files'
+parser.add_argument('-s', '--search', action='store_true', help='Run the server to search passwords in the txt files'
                                                                 ' of an input directory - should be run '
                                                                 'with --output-dir')
 args = parser.parse_args()
@@ -85,8 +79,7 @@ async def tlg_fetch(api_id, api_hash, channel_id, limit=100, file_size_limit=10 
                         file_path = f'{output_dir}/{message.media.document.attributes[0].file_name}'
                         if not os.path.exists(file_path) and message.media.document.attributes[0].file_name.replace(
                                 '.zip',
-                                '') not in os.listdir(
-                            f'{output_dir}/'):
+                                '') not in os.listdir(f'{output_dir}/'):
                             count_downloaded_files += 1
                             tqdm(message.download_media(f'{output_dir}/'))
                     elif isinstance(message.media, MessageMediaPhoto):
@@ -106,7 +99,8 @@ async def tlg_fetch(api_id, api_hash, channel_id, limit=100, file_size_limit=10 
 
                 if count_downloaded_files > 0:
                     print(
-                        f'\n{count_downloaded_files} files downloaded successfully from the {channel.chats[0].title} channel.')
+                        f'\n{count_downloaded_files} files downloaded successfully from the {channel.chats[0].title} '
+                        f'channel.')
                 else:
                     print(f'\nEverything is up-to-date.\n')
             else:
@@ -185,7 +179,6 @@ async def process_line(line):
 
 async def json_to_pd(json_file):
     if os.path.exists(json_file):
-        search_engine = SearchEngine()
         with open(json_file, "r") as file:
             information = js.load(file)
         datalist = []
